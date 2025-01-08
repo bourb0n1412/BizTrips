@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import "./App.css";
 
 import Footer from "./Footer";
@@ -6,57 +6,50 @@ import Header from "./Header";
 import TripList from "./components/TripList";
 import Wishlist from "./components/Wishlist";
 
-
 export default function App() {
-    const [wishlist, setWishlist] = useState([]); // [1,2,3,4,5
+  const [wishlist, setWishlist] = useState([]);
 
+  // Wishlist functions
+  function addToWishlist(trip) {
+    console.log("add to wishlist ->", trip);
+    const { id, title, description, startTrip, endTrip } = trip;
+    setWishlist((prevWishlist) => {
+      const tripInWishlist = prevWishlist.find((t) => t.id === id);
+      if (tripInWishlist) {
+        return prevWishlist;
+      } else {
+        return [...prevWishlist, { id, title, description, startTrip, endTrip }];
+      }
+    });
+  }
 
-    // wishlist functions
-    function addToWishlist(trip) {
-        console.log("add to wishlist->", trip);
-        const {id, title, description, startTrip, endTrip} = trip;
-        setWishlist((trip) => {
-            const tripInWishlist = trip.find((t) => t.id === id);
-            if (tripInWishlist) {
-                return trip;
-            } else {
-                return [...trip, {id, title, description, startTrip, endTrip}];
-            }
-        });
-    }
+  function removeFromWishlist(item) {
+    console.log("remove from wishlist ->", item);
+    setWishlist((trips) => trips.filter((t) => t.id !== item.id));
+  }
+  
 
-    function removeFromWishlist(item) {
-        console.log(item);
-        setWishlist((trip) => trip.filter((t) => t.id !== trip.id));
+  function clearWishlist() {
+    console.log("clear wishlist");
+    setWishlist([]);
+  }
 
-    }
+  return (
+    <>
+      <div>
+        <Header />
+        <main>
+          <h1>Welcome to biztrips-App</h1>
 
-
-    function clearWishlist() {
-        setWishlist([]);
-    }
-
-
-// if month selected then filter the trips from month === month
-
-// if error then throw the error
-
-// shorthand for react fragment
-    return (
-        <>
-            <div>
-                <Header/>
-                <main>
-                    <h1>Welcome to biztrips-App</h1>
-
-                    <Wishlist wishlist={wishlist} removeFromWishlist={() => removeFromWishlist()}
-                              clearWishlist={() => clearWishlist()}/>
-                    {/*   <WishList />*/}
-                    <TripList addToWishlist={addToWishlist}/>
-
-                </main>
-            </div>
-            <Footer/>
-        </>
-    );
+          <Wishlist
+            wishlist={wishlist}
+            removeFromWishlist={removeFromWishlist}
+            clearWishlist={clearWishlist}
+          />
+          <TripList addToWishlist={addToWishlist} />
+        </main>
+      </div>
+      <Footer />
+    </>
+  );
 }

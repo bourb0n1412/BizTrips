@@ -1,67 +1,150 @@
-import {logRoles, render, screen} from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
-//import useFetch from "./services/useFetch";
-//import {getBusinessTrips} from "./services/tripsService";
-/*
-it("ret without crashing", () => {
-  shallow(<App />);
-});
+import TripList from "../components/TripList";
+import Wishlist from "../components/Wishlist";
 
-it("renders Account header", () => {
-  const wrapper = shallow(<App />);
-  const welcome = <h1>Welcome to biztrips</h1>;
-  expect(wrapper.contains(welcome)).toEqual(true);
-});
-*/
-
-test('App renders a heading', () => {
-  render(<App />)
-
-  screen.getByRole('heading', {
-    name: "Welcome to biztrips Happy new Year-react - 2024",
-  })
-
-});
-
-/*describe("SearchForm", () => {
-  test("renders SearchForm", () => {
-    render(<renderTrip/>);
-    expect(screen.getByRole("heading", { name: /location search/i })
-    ).toBeVisible();
-
-    expect(screen.getByRole("textbox", { name: /choose an origin \(optional\)/i })
-    ).toBeVisible();
-
-    expect(screen.getByRole("textbox", { name: /choose a destination/i})
-    ).toBeVisible();
-
-    expect(screen.getByRole("button", { name: /search/i })
-    ).toBeVisible();
+describe("App Component", () => {
+  test("renders the App component with the correct heading", () => {
+    render(<App />);
+    const heading = screen.getByRole("heading", {
+      name: /welcome to biztrips-app/i,
+    });
+    expect(heading).toBeInTheDocument();
   });
-});*/
-//
-// test('the fetch fails with an error', async () => {
-//   await expect(getBusinessTrips()).rejects.toMatch('error');
-// });
-
-// test('the data is peanut butter', async () => {
-//   await expect(getBusinessTrips()).resolves.toContain('San Francisco World Trade Center on new Server/IOT/Client ');
-// });
-
-//
-// test('the data is peanut butter', async () => {
-//   await expect(useFetch()).resolves.toBe('peanut butter');
-// });
-
-//----
-const sum = function sum(a, b) {
-  return a + b;
-};
-test("adds 1 + 2 to equal 3", () => {
-  expect(sum(1, 2)).toBe(3);
 });
 
-//----
-test("two plus two is four", () => {
-  expect(2 + 2).toBe(4);
+describe("TripList Component", () => {
+  test("renders the TripList component with a loading message", () => {
+    render(<TripList addToWishlist={() => {}} />);
+    const loadingMessage = screen.getByText(/loading trips/i);
+    expect(loadingMessage).toBeInTheDocument();
+  });
+
+  test("renders trips when data is provided", async () => {
+    const mockTrips = [
+      {
+        id: 1,
+        title: "Trip to Paris",
+        description: "Eiffel Tower visit",
+        startTrip: [2024, 0, 1],
+        endTrip: [2024, 0, 10],
+      },
+    ];
+
+    jest.spyOn(global, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockTrips),
+      })
+    );
+
+    render(<TripList addToWishlist={() => {}} />);
+
+    const tripTitle = await screen.findByText(/trip to paris/i);
+    expect(tripTitle).toBeInTheDocument();
+
+    global.fetch.mockRestore();
+  });
+});
+
+describe("Wishlist Component", () => {
+  test("renders the Wishlist component with empty message", () => {
+    render(
+      <Wishlist
+        wishlist={[]}
+        removeFromWishlist={() => {}}
+        clearWishlist={() => {}}
+      />
+    );
+    const emptyMessage = screen.getByText(/wishlist is empty/i);
+    expect(emptyMessage).toBeInTheDocument();
+  });
+
+  test("renders wishlist items when data is provided", () => {
+    const mockWishlist = [
+      {
+        id: 1,
+        title: "Trip to Berlin",
+        description: "City tour",
+        startTrip: new Date(2024, 2, 15),
+        endTrip: new Date(2024, 2, 20),
+      },
+    ];
+
+    render(
+      <Wishlist
+        wishlist={mockWishlist}
+        removeFromWishlist={() => {}}
+        clearWishlist={() => {}}
+      />
+    );
+
+    const wishlistItems = screen.getAllByText(/trip to berlin/i);
+    expect(wishlistItems.length).toBeGreaterThan(0);
+  });
+});
+
+describe("User Interactions", () => {
+  test("adds a trip to the wishlist", async () => {
+    const mockTrips = [
+      {
+        id: 1,
+        title: "Trip to Paris",
+        description: "Eiffel Tower visit",
+        startTrip: [2024, 0, 1],
+        endTrip: [2024, 0, 10],
+      },
+    ];
+  
+    jest.spyOn(global, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockTrips),
+      })
+    );
+  
+    render(<App />);
+  
+    // Finde den Add-to-Wishlist-Button für den Trip "Trip to Paris"
+    const addButton = await screen.findByRole("button", {
+      name: /add to wishlist/i,
+    });
+    fireEvent.click(addButton);
+  
+    // Suche gezielt nach dem Eintrag in der Wishlist
+    const wishlistItems = await screen.findAllByText(/trip to paris/i);
+  
+    // Überprüfen, dass das Element zur Wishlist hinzugefügt wurde
+    expect(wishlistItems.length).toBeGreaterThan(0);
+  
+    global.fetch.mockRestore();
+  });
+  
+
+  test("removes a trip from the wishlist", async () => {
+    const mockWishlist = [
+      {
+        id: 1,
+        title: "Trip to Berlin",
+        description: "City tour",
+        startTrip: new Date(2024, 2, 15),
+        endTrip: new Date(2024, 2, 20),
+      },
+    ];
+
+    const mockRemoveFromWishlist = jest.fn();
+
+    render(
+      <Wishlist
+        wishlist={mockWishlist}
+        removeFromWishlist={mockRemoveFromWishlist}
+        clearWishlist={() => {}}
+      />
+    );
+
+    const deleteButton = screen.getByRole("button", { name: /delete item/i });
+    fireEvent.click(deleteButton);
+
+    expect(mockRemoveFromWishlist).toHaveBeenCalled();
+  });
 });

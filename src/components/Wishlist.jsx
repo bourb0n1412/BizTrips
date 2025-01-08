@@ -1,22 +1,19 @@
-import React, {} from "react";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-// deconstruct props
+
+// Wishlist-Komponente
 export default function Wishlist({ wishlist, removeFromWishlist, clearWishlist }) {
-
-  // as constant variant 2
-  const itemsMapped = wishlist.map((item, index) => (
-
+  const itemsMapped = wishlist.map((item) => (
     <WishlistItem
-      removeFromWishlist={removeFromWishlist}
+      key={item.id}
       item={item}
-      key={index}
+      removeFromWishlist={removeFromWishlist}
     />
   ));
 
-  const empty = (
+  const emptyWishlistMessage = (
     <tr>
-      <td colSpan="4">
-        {" "}
+      <td colSpan="3">
         <p className="alert alert-info">Wishlist is empty</p>
       </td>
     </tr>
@@ -24,105 +21,87 @@ export default function Wishlist({ wishlist, removeFromWishlist, clearWishlist }
 
   return (
     <div className="container">
-      <>
-        <h2 className="h4">Wishlist</h2>
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="card table-responsive">
-              <table className="table table-hover shopping-cart-wrap">
-                <thead className="text-muted">
-                  <tr>
-                    <th scope="col">Trip</th>
-
-                    <th scope="col" width="120">
-                      Price
-                    </th>
-                    <th scope="col" width="200" className="text-right">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>{itemsMapped.length > 0 ? itemsMapped : empty}</tbody>
-                <tfoot>
-                  <tr>
-
-                    <th scope="col">
-                      <dl className="dlist-align">
-                        <dt>Total </dt>
-
-                      </dl>
-                    </th>
-                    <th scope="col" />
-                    <th scope="col">
-                     { <button
-                        //onClick={heartItem}
-                        className="btn btn-outline-success fa fa-heart fa-xs"
-                      />}
-                      <button
-                        className="btn btn-outline-danger"
-                        onClick={clearWishlist}
-                        disabled={itemsMapped.length === 0}
-                      >
-                        empty wishlist
-                      </button>
-                    </th>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+      <h2 className="h4">Wishlist</h2>
+      <div className="row">
+        <div className="col-sm-12">
+          <div className="card table-responsive">
+            <table className="table table-hover shopping-cart-wrap">
+              <thead className="text-muted">
+                <tr>
+                  <th scope="col">Trip</th>
+                  <th scope="col" width="120">Price</th>
+                  <th scope="col" width="200" className="text-right">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {itemsMapped.length > 0 ? itemsMapped : emptyWishlistMessage}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="col">
+                    <dl className="dlist-align">
+                      <dt>Total</dt>
+                    </dl>
+                  </th>
+                  <th scope="col"></th>
+                  <th scope="col">
+                    <button
+                      className="btn btn-outline-danger"
+                      onClick={clearWishlist}
+                      disabled={itemsMapped.length === 0}
+                    >
+                      Empty Wishlist
+                    </button>
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
-      </>
+      </div>
     </div>
   );
 }
 
-function WishlistItem(props) {
-  // deconstruct props
-  const { removeFromWishlist, item } = props;
-  // props
-  let { id, title, description, startTrip, endTrip } = item;
+// Einzelnes Wishlist-Item
+function WishlistItem({ item, removeFromWishlist }) {
+  const { id, title, description, startTrip, endTrip } = item;
 
-  console.log("WishlistItem", props);
-
-  // console.log("WishlistItem", item);
   return (
-    <tr key={id}>
+    <tr>
       <td>
         <figure className="media">
-
           <div className="img-wrap">
             <img
               className="img-thumbnail img-xs"
-              src={"/images/items/" + id + ".jpg"}
-              alt="img"
+              src={`/images/items/${id}.jpg`}
+              alt={title}
             />
           </div>
           <figcaption className="media-body">
             <h6 className="h6">{title}</h6>
             <dl className="dlist-inline small">
-              <dt>{title}</dt>
+              <dt>Description:</dt>
               <dd>{description}</dd>
             </dl>
             <dl className="dlist-inline small">
-              <dt>{startTrip.toLocaleString()}</dt>
-              <dd>{endTrip.toLocaleString()}</dd>
+              <dt>Start:</dt>
+              <dd>{new Date(startTrip).toLocaleDateString()}</dd>
+              <dt>End:</dt>
+              <dd>{new Date(endTrip).toLocaleDateString()}</dd>
             </dl>
           </figcaption>
         </figure>
       </td>
       <td className="price-wrap price"></td>
       <td className="text-right">
-        <button className="btn btn-outline-success fa fa-heart fa-xs" />
-        <i className="fa-regular fa-heart"></i>
         <button
           className="btn btn-outline-danger"
-          // onClick={ () => removeFromWishlist(props.item) } // App deleteItem
-
-
-            onClick={(item) => removeFromWishlist(item)}
+          onClick={() => removeFromWishlist(item)}
         >
-          delete Item
+          Delete Item
         </button>
       </td>
     </tr>

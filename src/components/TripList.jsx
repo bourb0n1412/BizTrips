@@ -1,77 +1,68 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Functional Component: TripList
 function TripList({ addToWishlist }) {
-  const [month, setMonth] = useState(""); // State für Filtermonat
-  const [trips, setTrips] = useState([]); // State für Trips-Daten
+  const [month, setMonth] = useState(""); // Filtermonat
+  const [trips, setTrips] = useState([]); // Liste der Trips
+  const [loading, setLoading] = useState(true); // Ladezustand
+  const [error, setError] = useState(null); // Fehlerzustand
+
   const months = ["Idle", "Jan", "Feb", "March", "April", "Mai", "June"];
 
-  // Fetch Trips-Daten vom JSON-Server
   useEffect(() => {
+    // Fetch Trips-Daten
     fetch("http://localhost:3001/trips")
       .then((response) => {
         if (!response.ok) throw new Error("Failed to fetch trips");
         return response.json();
       })
       .then((data) => {
-        // Konvertiere die startTrip- und endTrip-Daten in gültige Date-Objekte
+        // Konvertiere Daten
         const convertedData = data.map((trip) => ({
           ...trip,
           startTrip: new Date(...trip.startTrip),
           endTrip: new Date(...trip.endTrip),
         }));
         setTrips(convertedData);
+        setLoading(false);
       })
-      .catch((error) => console.error("Error fetching trips:", error));
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
   }, []);
 
-  // Filter Trips nach Monat
   const filteredTrips = month
     ? trips.filter((t) => t.startTrip.getMonth() + 1 === parseInt(month))
     : trips;
 
-  // Kein Trip vorhanden
-  const empty = (
-    <section>
-      <p className="alert alert-info">Triplist is empty</p>
-    </section>
-  );
+  if (loading) {
+    return <p className="alert alert-info">Loading trips...</p>;
+  }
+
+  if (error) {
+    return (
+      <p className="alert alert-danger">
+        Error loading trips: {error}. Please try again later.
+      </p>
+    );
+  }
 
   return (
     <div className="container">
       <section>
         <h2 className="h4">Triplist-Catalog</h2>
-        <section id="filters">
-          <label htmlFor="month">Filter by Month:</label>
-          <select
-            id="month"
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-          >
-            <option value="">All Months</option>
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">Mai</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
 
-          {month && (
-            <h2>
-              Found {filteredTrips.length}
-              {filteredTrips.length > 1 ? " trips" : " trip"} for the month of{" "}
-              {months[month]}
-            </h2>
-          )}
-        </section>
+        {/* Filterkomponente */}
+        <TripFilter month={month} setMonth={setMonth} months={months} />
+
+        {month && (
+          <h2>
+            Found {filteredTrips.length}{" "}
+            {filteredTrips.length > 1 ? "trips" : "trip"} for the month of{" "}
+            {months[month]}
+          </h2>
+        )}
 
         <div className="row">
           {filteredTrips.length > 0 ? (
@@ -79,7 +70,7 @@ function TripList({ addToWishlist }) {
               <Trip addToWishlist={addToWishlist} trip={trip} key={trip.id} />
             ))
           ) : (
-            empty
+            <p className="alert alert-info">Triplist is empty</p>
           )}
         </div>
       </section>
@@ -87,7 +78,26 @@ function TripList({ addToWishlist }) {
   );
 }
 
-// Einzelner Trip
+function TripFilter({ month, setMonth, months }) {
+  return (
+    <section id="filters">
+      <label htmlFor="month">Filter by Month:</label>
+      <select
+        id="month"
+        value={month}
+        onChange={(e) => setMonth(e.target.value)}
+      >
+        <option value="">All Months</option>
+        {Array.from({ length: 12 }, (_, i) => (
+          <option value={i + 1} key={i}>
+            {months[i + 1]}
+          </option>
+        ))}
+      </select>
+    </section>
+  );
+}
+
 function Trip({ addToWishlist, trip }) {
   const { id, title, description, startTrip, endTrip } = trip;
 
