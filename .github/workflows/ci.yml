@@ -46,18 +46,8 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Log Build Output
-        run: |
-          echo "Checking build directory:"
-          ls -la
-          echo "Build Output:"
-          cat build/* || echo "No build output found."
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: build/
+      - name: Check Build Directory
+        run: ls -la build/
 
   deploy:
     name: Deploy Project
@@ -74,9 +64,6 @@ jobs:
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
-
-      - name: Verify Build Artifacts
-        run: ls -la build/
 
       - name: Deploy to Netlify
         env:
