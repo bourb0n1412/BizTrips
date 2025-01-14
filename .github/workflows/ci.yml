@@ -73,7 +73,10 @@ jobs:
         with:
           name: build
 
-      - name: Check Build Directory
+      - name: Debug Artifact Download
+        run: ls -la
+
+      - name: Debug Build Directory
         run: ls -la build/
 
       - name: Install Netlify CLI
