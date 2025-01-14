@@ -46,8 +46,12 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify Build Directory
-        run: ls -la build/
+      - name: Log Build Output
+        run: |
+          echo "Checking build directory:"
+          ls -la
+          echo "Build Output:"
+          cat build/* || echo "No build output found."
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
