@@ -46,7 +46,7 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Check Build Directory
+      - name: Verify Build
         run: ls -la build/
 
   deploy:
