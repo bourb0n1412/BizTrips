@@ -47,7 +47,13 @@ jobs:
         run: npm run build
 
       - name: Verify Build Directory
-        run: ls -la build/
+        run: |
+          echo "Checking build directory..."
+          ls -la build/
+          if [ ! -d build ]; then
+            echo "Build directory not found, exiting..."
+            exit 1
+          fi
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
