@@ -46,8 +46,14 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify Build
+      - name: Verify Build Directory
         run: ls -la build/
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/
 
   deploy:
     name: Deploy Project
@@ -61,6 +67,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      - name: Check Build Directory
+        run: ls -la build/
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
