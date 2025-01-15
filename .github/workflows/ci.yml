@@ -88,10 +88,10 @@ jobs:
         run: |
           echo "Inhalt des Root-Verzeichnisses vor Überprüfung:"
           ls -la
+          echo "Inhalt des Arbeitsverzeichnisses nach Download:"
+          find . -type f -or -type d
           if [ ! -d build ]; then
             echo "Fehler: Build-Artefakt wurde nicht korrekt heruntergeladen!"
-            echo "Inhalt des aktuellen Verzeichnisses:"
-            ls -la
             echo "Versuch, Artefakt-Verzeichnis zu finden:"
             find . -name "build"
             exit 1
