@@ -50,6 +50,10 @@ jobs:
         run: |
           echo "Verzeichnisinhalt nach Build:"
           ls -la
+          if [ ! -d build ]; then
+            echo "Warnung: 'build' wurde nicht gefunden. Überprüfe den Build-Prozess."
+          fi
+      
 
       - name: Verify Build Directory
         run: |
