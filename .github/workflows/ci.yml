@@ -46,6 +46,11 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Debug Build Output
+        run: |
+          echo "Verzeichnisinhalt nach Build:"
+          ls -la
+
       - name: Verify Build Directory
         run: |
           echo "Checking build directory..."
@@ -78,6 +83,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
+
+      - name: Überprüfe Artefakt-Download
+        run: |
+          if [ ! -d build ]; then
+            echo "Fehler: Build-Artefakt wurde nicht korrekt heruntergeladen!"
+            exit 1
+          fi
 
       - name: Debug Verify Artifact Download
         run: |
