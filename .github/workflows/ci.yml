@@ -79,11 +79,12 @@ jobs:
         with:
           name: build
 
-      - name: Debug Artifact Download
-        run: ls -la
-
-      - name: Debug Build Directory
-        run: ls -la build/
+      - name: Debug: Verify Artifact Download
+        run: |
+          echo "Inhalt des Root-Verzeichnisses nach Download:"
+          ls -la
+          echo "Inhalt des build-Verzeichnisses:"
+          ls -la build || echo "Das Verzeichnis 'build' existiert nicht!"
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
@@ -92,4 +93,9 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: netlify deploy --dir=build --prod
+        run: |
+          if [ ! -d build ]; then
+            echo "Fehler: Build-Verzeichnis fehlt. Abbruch!"
+            exit 1
+          fi
+          netlify deploy --dir=build --prod
