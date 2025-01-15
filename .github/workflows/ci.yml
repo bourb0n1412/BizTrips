@@ -79,7 +79,7 @@ jobs:
         with:
           name: build
 
-      - name: Debug: Verify Artifact Download
+      - name: Debug Verify Artifact Download
         run: |
           echo "Inhalt des Root-Verzeichnisses nach Download:"
           ls -la
