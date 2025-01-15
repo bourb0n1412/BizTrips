@@ -122,3 +122,9 @@ jobs:
         run: |
           echo "Deployment abgeschlossen. Debugging des aktuellen Verzeichnisses:"
           ls -la
+
+      - name: Debugging for Artifact Location
+        run: |
+          echo "Alle Dateien und Verzeichnisse im Root:"
+          find . -type f -or -type d
+          echo "Ende der Verzeichnisanalyse."
