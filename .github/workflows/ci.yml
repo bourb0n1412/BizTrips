@@ -86,6 +86,8 @@ jobs:
 
       - name: Überprüfe Artefakt-Download
         run: |
+          echo "Inhalt des Root-Verzeichnisses vor Überprüfung:"
+          ls -la
           if [ ! -d build ]; then
             echo "Fehler: Build-Artefakt wurde nicht korrekt heruntergeladen!"
             echo "Inhalt des aktuellen Verzeichnisses:"
