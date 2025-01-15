@@ -46,12 +46,7 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Debug Build Output
-        run: |
-          echo "Verzeichnisinhalt nach Build:"
-          ls -la
-
-      - name: Verify Build Directory
+      - name: Verify Build Output
         run: |
           echo "Checking build directory..."
           ls -la build/
@@ -83,26 +78,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
+          path: ./build
 
-      - name: Überprüfe Artefakt-Download
+      - name: Debug Build Artifact
         run: |
-          echo "Inhalt des Root-Verzeichnisses vor Überprüfung:"
-          ls -la
-          echo "Inhalt des Arbeitsverzeichnisses nach Download:"
-          find . -type f -or -type d
-          if [ ! -d build ]; then
-            echo "Fehler: Build-Artefakt wurde nicht korrekt heruntergeladen!"
-            echo "Versuch, Artefakt-Verzeichnis zu finden:"
-            find . -name "build"
-            exit 1
-          fi
-
-      - name: Debug Verify Artifact Download
-        run: |
-          echo "Inhalt des Root-Verzeichnisses nach Download:"
-          ls -la
-          echo "Inhalt des build-Verzeichnisses:"
-          ls -la build || echo "Das Verzeichnis 'build' existiert nicht!"
+          echo "Contents of build directory after artifact download:"
+          ls -la build/
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
@@ -113,18 +94,7 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           if [ ! -d build ]; then
-            echo "Fehler: Build-Verzeichnis fehlt. Abbruch!"
+            echo "Build directory is missing. Deployment aborted!"
             exit 1
           fi
           netlify deploy --dir=build --prod
-
-      - name: Final Debugging Step
-        run: |
-          echo "Deployment abgeschlossen. Debugging des aktuellen Verzeichnisses:"
-          ls -la
-
-      - name: Debugging for Artifact Location
-        run: |
-          echo "Alle Dateien und Verzeichnisse im Root:"
-          find . -type f -or -type d
-          echo "Ende der Verzeichnisanalyse."
